@@ -13,20 +13,20 @@ public class Runner : MonoBehaviour
     private const int CoinFromOneCoins = 1;
     private const int DamageFromOneObstacle = 1;
     
-    [SerializeField]private int maxHealth = 3;
-    [SerializeField]protected float speedForward = 3;
-    [SerializeField]protected float speedRotating = 50;
+    [SerializeField] private int maxHealth = 3;
+    [SerializeField] protected float speedForward = 3;
+    [SerializeField] protected float speedRotating = 50;
     
-    [SerializeField]private int startAttackDamage;
-    [SerializeField]private int startAttackSpeed;
+    [SerializeField] private int startAttackDamage;
+    [SerializeField] private int startAttackSpeed;
 
-    private int _coins;
     private int _health;
 
     protected float AttackDamage { get; private set; }
+    public int _coins{ get; private set; }
     protected float AttackSpeed { get; private set; }
 
-    private int _shipLevel;
+    public int _shipLevel { get; private set; }
     protected bool GamePaused;
     
     private void Start()
@@ -39,6 +39,7 @@ public class Runner : MonoBehaviour
     
     private void OnControllerColliderHit(ControllerColliderHit hitInfo)
     {
+        Debug.Log(hitInfo.gameObject.tag);
         switch (hitInfo.gameObject.tag)
         {
             case ObstacleTag:
@@ -58,7 +59,7 @@ public class Runner : MonoBehaviour
                 Upgrade();
                 break;
         }
-        // hitInfo.gameObject.SetActive(false);
+        hitInfo.gameObject.SetActive(false);
     }
 
     private void TakeDamage(int damage)
@@ -93,6 +94,7 @@ public class Runner : MonoBehaviour
         _health = maxHealth;
         AttackDamage = startAttackDamage;
         AttackSpeed = startAttackSpeed;
+        _shipLevel = 0;
         
         EventBus.SetCoins?.Invoke(_coins);
         EventBus.SetHp?.Invoke(_health);
@@ -100,12 +102,6 @@ public class Runner : MonoBehaviour
 
     private void Upgrade()
     {
-        _shipLevel++;
-        if (_shipLevel < 4)
-        {
-            SetMeshLvl(_shipLevel);
-        }
-
         if (transform.position.x < 0)
         {
             AttackDamage += _coins;
@@ -114,9 +110,19 @@ public class Runner : MonoBehaviour
         {
             AttackSpeed += _coins;
         }
+    }
 
-        _coins = 0;
+    public void SpendCoins(int coins)
+    {
+        if (coins <= 0)
+            throw new ArgumentOutOfRangeException(nameof(coins), "Value must be non-negative!");
+        
+        _coins -= coins;
         EventBus.SetCoins?.Invoke(_coins);
     }
-    protected virtual void SetMeshLvl(int shipLevel) { }
+
+    public void ShipLevelUp()
+    {
+        _shipLevel++;
+    }
 }

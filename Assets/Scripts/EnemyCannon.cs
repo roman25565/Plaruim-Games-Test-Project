@@ -1,13 +1,12 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class EnemyCannon : Enemy
 {
-    [SerializeField]private Transform bulletSpawnPoint;
-    [SerializeField]private Transform bulletPrefab;
-    [SerializeField]private float bulletSpeed = 10;
-    [FormerlySerializedAs("_attackSpeed")] [SerializeField] private float attackSpeed;
+    [SerializeField] protected Transform bulletSpawnPoint;
+    [SerializeField] protected Transform bulletPrefab;
+    [SerializeField] protected float bulletSpeed = 10;
+    [SerializeField] private float attackSpeed;
 
     private float nextShootTime;
     private void Start()
@@ -15,7 +14,7 @@ public class EnemyCannon : Enemy
         nextShootTime = Time.time;
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         if (Time.time >= nextShootTime) StartCoroutine(Shoot());
     }
@@ -24,9 +23,14 @@ public class EnemyCannon : Enemy
     {
         nextShootTime = Time.time + 1 / attackSpeed;
 
-        var bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
-        bullet.GetComponent<Rigidbody>().AddForce(bulletSpeed * new Vector3(0,0,-1), ForceMode.Impulse);
+        CreateBullet();
 
         yield return new WaitForSeconds(1 / attackSpeed);
+    }
+
+    protected virtual void CreateBullet()
+    {
+        var bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
+        bullet.GetComponent<Rigidbody>().AddForce(bulletSpeed * new Vector3(0,0,-1), ForceMode.Impulse);
     }
 }

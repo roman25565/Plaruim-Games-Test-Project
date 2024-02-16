@@ -5,9 +5,8 @@ public class CoinsBar : UIFather
 {
     [SerializeField] private TextMeshProUGUI text;
 
-    private void Awake()
+    protected override void Awake()
     {
-        MainUIObject = text.gameObject;
         EventBus.SetCoins.AddListener(SetCoins);
     }
 

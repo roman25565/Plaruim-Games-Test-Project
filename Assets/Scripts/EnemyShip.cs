@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class EnemyShip : MonoBehaviour
 {
-    [SerializeField]private float speed; 
-    [SerializeField]private float lineRadius = 7;
+    [SerializeField] private float speed; 
+    [SerializeField] private float lineRadius = 7;
     
-    [SerializeField]private Vector3 _targetPoz;
+    [SerializeField] private Vector3 _targetPoz;
     private Vector3 _startPoz;
     private void Start()
     {
@@ -20,7 +20,6 @@ public class EnemyShip : MonoBehaviour
         
         if (Vector3.Distance(transform.position, _targetPoz) < 0.1)
         {
-            Debug.Log(Mathf.Abs(_targetPoz.x) - lineRadius);
             var x = Mathf.Abs(_targetPoz.x - lineRadius) < 0.1f ? -lineRadius : lineRadius;
             CreateTargetPoz(x);
         }

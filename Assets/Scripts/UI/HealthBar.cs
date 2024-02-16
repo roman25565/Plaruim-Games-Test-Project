@@ -5,13 +5,13 @@ public class HealthBar : UIFather
 {
     private Image[] _heartFills;
 
-    [SerializeField]private GameObject heartPrefab;
+    [SerializeField] private GameObject heartPrefab;
     
-    [SerializeField]private Transform parent;
+    [SerializeField] private Transform parent;
 
-    private void Awake()
+    protected override void Awake()
     {
-        MainUIObject = parent.gameObject;
+        base.Awake();
         EventBus.SetHp.AddListener(UiSetHp);
         EventBus.InitHp.AddListener(Init);
     }

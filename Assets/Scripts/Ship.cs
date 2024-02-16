@@ -3,33 +3,36 @@ using UnityEngine;
 
 public class Ship : Runner
 {
-    [SerializeField]private Mesh[] shipMeshes;
-    [SerializeField]private MeshFilter playerShipMesh;
+    private const float AccelerationOfGravity = 9.8f;
+        
+    [SerializeField] private Mesh[] shipMeshes;
+    [SerializeField] private MeshFilter playerShipMesh;
+    [SerializeField] private WaveMesh waveMesh;
     
-    [SerializeField]private Transform bulletSpawnPoint;
-    [SerializeField]private Transform bulletPrefab;
-    [SerializeField]private float bulletSpeed = 10;
+    [SerializeField] private Transform bulletSpawnPoint;
+    [SerializeField] private Transform bulletPrefab;
+    [SerializeField] private float bulletSpeed = 10;
     
-    [SerializeField]private float rotationSensitivity = 30.0f;
-    [SerializeField]private float maxRotationAngle = 45.0f;
+    [SerializeField] private float rotationSensitivity = 30.0f;
+    [SerializeField] private float maxRotationAngle = 45.0f;
     
     private Vector2 _lastTouch;
     private Vector2 _touchStart;
     private Quaternion _targetRotation;
     
     private Vector3 _startPoz;
-    private CharacterController _characterController;
     private float nextShootTime;
-    
 
+    private CharacterController _characterController;
     private void Awake()
     {
-        _characterController = gameObject.GetComponent<CharacterController>();
         EventBus.GameStart.AddListener(GameStart);
         EventBus.ClearPlayerData.AddListener(() => SetMeshLvl(0));
         
         _startPoz = transform.position;
         nextShootTime = Time.time;
+
+        _characterController = gameObject.GetComponent<CharacterController>();
     }
 
     private void Update()
@@ -59,7 +62,7 @@ public class Ship : Runner
                 float normalizedDeltaX = touchDelta.x / Screen.width;
                 targetRotationAngle = normalizedDeltaX * rotationSensitivity;
                 
-                result = touch.position.x - _lastTouch.x == 0 ? 0 : touch.position.x - _lastTouch.x > 0 ? 1 : -1;
+                result = Mathf.Abs(touch.position.x - _lastTouch.x) <= 0.01 ? 0 : touch.position.x - _lastTouch.x > 0 ? 1 : -1;
                 _lastTouch = touch.position;
             }
         }
@@ -72,14 +75,12 @@ public class Ship : Runner
     {
         _characterController.Move(Time.deltaTime * speedForward * Vector3.forward);
         _characterController.Move(Time.deltaTime * speedRotating * new Vector3(rotatingDirection, 0, 0));
-
+        
         transform.rotation = Quaternion.Lerp(transform.rotation, _targetRotation, rotationSensitivity * Time.deltaTime);
-
-        Debug.Log(!_characterController.isGrounded);
-        if (!_characterController.isGrounded)
-        {
-            transform.position += Vector3.down * (4 * Time.deltaTime);
-        }
+        
+        var waveheight = waveMesh.GetWaveHeight(transform.position);
+        float step = waveheight - transform.position.y;
+        _characterController.Move(Time.deltaTime * step * Vector3.up);
     }
 
     private bool NeedSoot()
@@ -106,7 +107,7 @@ public class Ship : Runner
         yield return new WaitForSeconds(1 / AttackSpeed);
     }
 
-    protected override void SetMeshLvl(int shipLevel)
+    public void SetMeshLvl(int shipLevel)
     {
         playerShipMesh.mesh = shipMeshes[shipLevel];
     }
@@ -115,6 +116,7 @@ public class Ship : Runner
     {
         gameObject.transform.position = _startPoz;
         StartCoroutine(DelayResumeGame());
+        
     }
     
     private IEnumerator DelayResumeGame()

@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class UIFather: MonoBehaviour
 {
-    protected GameObject MainUIObject;
-
-
-    private void Awake()
+    private GameObject MainUIObject;
+    
+    protected virtual void Awake()
     {
+        MainUIObject = transform.GetChild(0).gameObject;
+        
         EventBus.GameOver.AddListener(StopUI);
         EventBus.LevelСomplete.AddListener(StopUI);
-        
         EventBus.GameStart.AddListener(StartUI);
     }
 

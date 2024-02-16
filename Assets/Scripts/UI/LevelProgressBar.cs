@@ -8,12 +8,13 @@ public class LevelProgressBar : UIFather
     [SerializeField] private Transform Player;  
     [SerializeField] private Transform EndLevel;
     
-    [SerializeField]private float delay = 1.0f;
+    [SerializeField] private float delay = 1.0f;
 
     private float _levelLength;
     private Coroutine _coroutine;
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         _levelLength = Vector3.Distance(Player.position, EndLevel.position);
         
         _coroutine = StartCoroutine(UpdateSliderCalculate());

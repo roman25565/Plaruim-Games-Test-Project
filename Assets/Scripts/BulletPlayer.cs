@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class BulletPlayer : Bullet
 {
-    [HideInInspector]public float bulletDamage;
+    [HideInInspector] public float bulletDamage;
 
     private void OnCollisionEnter(Collision other)
     {
